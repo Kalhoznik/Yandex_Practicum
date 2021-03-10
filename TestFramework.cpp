@@ -177,7 +177,7 @@ private:
 		int rating;
 		DocumentStatus status;
 	};
-	
+
 	set<string> stop_words_;
 	map<string, map<int, double>> word_to_document_freqs_;
 	map<int, DocumentData> documents_;
@@ -361,11 +361,11 @@ void TestAddingDocument() {
 	search_server.AddDocument(4, "собака на сене"s, DocumentStatus::ACTUAL, { 9 });
 	search_server.AddDocument(5, "кот в сапогах"s, DocumentStatus::ACTUAL, { 1,1,1 });
 	{
-		const auto& doc = search_server.FindTopDocuments("ухоженный хвост"s);
+		const auto doc = search_server.FindTopDocuments("ухоженный хвост"s);
 		ASSERT_EQUAL(doc.size(), 2);
 		ASSERT_EQUAL(doc[0].id, 1);
 		ASSERT_EQUAL(doc[1].id, 2);
-			}
+	}
 	{
 		const auto& doc = search_server.FindTopDocuments("чайка летит"s);
 		ASSERT_HINT(doc.empty(), "Size must equal to zero");
@@ -374,12 +374,12 @@ void TestAddingDocument() {
 
 void TestExludeDocmentsWhoContainsMinusWords() {
 	SearchServer search_server;
-	const string document_conetent = "ухоженный пес и хвост";
+	const string document_conetent = "ухоженный пес и хвост"s;
 
 	{
 		SearchServer search_server;
 		search_server.AddDocument(0, document_conetent, DocumentStatus::ACTUAL, { 3,2,1,6 });
-		const string query = "пес и хвост";
+		const string query = "пес и хвост"s;
 		const auto& docs = search_server.FindTopDocuments(query);
 		ASSERT_EQUAL(docs.size(), 1u);
 		ASSERT_EQUAL(docs[0].id, 0);
@@ -388,9 +388,9 @@ void TestExludeDocmentsWhoContainsMinusWords() {
 	{
 		SearchServer search_server;
 		search_server.AddDocument(0, document_conetent, DocumentStatus::ACTUAL, { 3,2,1,6 });
-		const string query = "пес и -хвост";
+		const string query = "пес и -хвост"s;
 		const auto& docs = search_server.FindTopDocuments(query);
-		ASSERT_HINT(docs.empty(), "Size must be empty");
+		ASSERT_HINT(docs.empty(), "Size must be empty"s);
 	}
 
 }
@@ -398,7 +398,7 @@ void TestMatch() {
 
 	const string document_content = "слепая собака и глухой кот"s;
 	const string stop_words = "и"s;
-	
+
 	{
 		SearchServer server;
 		server.AddDocument(4, document_content, DocumentStatus::ACTUAL, { 5,2,1 });
@@ -435,7 +435,6 @@ void TestMatch() {
 		const auto&[words, status] = server.MatchDocument(query, 4);
 		ASSERT_HINT(words.empty(), "The set of words must be empty"s);
 	}
-
 }
 
 void TestRelevantseSort() {
@@ -447,55 +446,53 @@ void TestRelevantseSort() {
 	server.AddDocument(1, first_doc_content, DocumentStatus::ACTUAL, { 5,2,1 });
 	server.AddDocument(2, second_doc_content, DocumentStatus::ACTUAL, { 3,2,5 });
 	server.AddDocument(3, third_doc_content, DocumentStatus::ACTUAL, { 2,7,10 });
-	const string query = "кот пёс хвост";
+	const string query = "кот пёс хвост"s;
 	const auto& docs = server.FindTopDocuments(query);
-	size_t prev = 0;
 	for (size_t curr = 1; curr < docs.size(); ++curr) {
-		ASSERT_HINT(docs[prev].relevance > docs[curr].relevance, "Previous document must be great then current");
-		prev = curr;
+		ASSERT_HINT(docs[curr].relevance < docs[curr - 1].relevance, "Previous document must be great then current"s);
 	}
 }
 
 void TestComputeRating() {
-	string first_doc_content = "белый кот и модный ошейник"s;
-	string second_doc_content = "ухоженный пёс выразительные глаза"s;
+	const string first_doc_content = "белый кот и модный ошейник"s;
+	const string second_doc_content = "ухоженный пёс выразительные глаза"s;
 	SearchServer server;
 	server.AddDocument(1, first_doc_content, DocumentStatus::ACTUAL, { 5,2,1 });
 	server.AddDocument(2, second_doc_content, DocumentStatus::ACTUAL, { 3,2,5 });
 	string query = "кот пёс хвост";
-	const auto& docs = server.FindTopDocuments(query);
+	const auto docs = server.FindTopDocuments(query);
+	ASSERT_EQUAL(docs.size(), 2);
 	ASSERT_EQUAL(docs[0].rating, 3);
-	ASSERT_EQUAL_HINT(docs[1].rating, 2, "Rating must be equal average");
+	ASSERT_EQUAL_HINT(docs[1].rating, 2, "Rating must be equal average"s);
 }
 
 void TestFilteringWhithPredicate() {
 	const string first_doc_content = "белый кот и модный ошейник"s;
 	const string second_doc_content = "ухоженный пёс выразительные глаза"s;
 	const string third_doc_content = "пушистый пушистый хвост"s;
-	
+
 	SearchServer server;
 	server.AddDocument(1, first_doc_content, DocumentStatus::ACTUAL, { 5,2,1 });
 	server.AddDocument(2, second_doc_content, DocumentStatus::ACTUAL, { 3,2,5 });
 	server.AddDocument(3, third_doc_content, DocumentStatus::ACTUAL, { 2,5,6 });
 	const string query = "кот пёс хвост";
-	const auto& docs = server.FindTopDocuments(query, [](int document_id, DocumentStatus status, int rating) { return document_id >= 2; });
+	const auto docs = server.FindTopDocuments(query, [](int document_id, DocumentStatus status, int rating) { return document_id >= 2; });
 
-	ASSERT(docs.size() == 2);
+	ASSERT_EQUAL(docs.size(), 2);
 	ASSERT_EQUAL(docs[0].id, 3);
 	ASSERT_EQUAL(docs[1].id, 2);
-
 }
 
 void TestFilteringDocumentWhithDocumentStatus() {
 	const string first_doc_content = "белый кот и модный ошейник"s;
 	const string second_doc_content = "ухоженный пёс выразительные глаза"s;
-	
+
 
 	{
 		SearchServer server;
 		server.AddDocument(1, first_doc_content, DocumentStatus::ACTUAL, { 5,2,1 });
 		server.AddDocument(2, second_doc_content, DocumentStatus::BANNED, { 3,2,5 });
-		const string query = "кот пёс хвост";
+		const string query = "кот пёс хвост"s;
 		const auto& docs = server.FindTopDocuments(query, DocumentStatus::ACTUAL);
 		ASSERT_EQUAL(docs[0].id, 1);
 	}
@@ -504,7 +501,7 @@ void TestFilteringDocumentWhithDocumentStatus() {
 		SearchServer server;
 		server.AddDocument(1, first_doc_content, DocumentStatus::ACTUAL, { 5,2,1 });
 		server.AddDocument(2, second_doc_content, DocumentStatus::BANNED, { 3,2,5 });
-		const string query = "кот пёс хвост";
+		const string query = "кот пёс хвост"s;
 		const auto& docs = server.FindTopDocuments(query, DocumentStatus::BANNED);
 		ASSERT_EQUAL(docs[0].id, 2);
 	}
@@ -520,12 +517,13 @@ void TestComputeRelevance() {
 	server.AddDocument(1, first_doc_content, DocumentStatus::ACTUAL, { 5,2,1 });
 	server.AddDocument(2, second_doc_content, DocumentStatus::ACTUAL, { 3,2,5 });
 	server.AddDocument(3, third_doc_content, DocumentStatus::ACTUAL, { 2,5,6 });
-	const string query = "кот пёс хвост";
-	const auto& docs = server.FindTopDocuments(query, DocumentStatus::ACTUAL);
+	const string query = "кот пёс хвост"s;
+	const auto docs = server.FindTopDocuments(query, DocumentStatus::ACTUAL);
 	const double EPSILON = 1e-6;
-	ASSERT(abs(docs[0].relevance - 0.366204) < EPSILON);
-	ASSERT(abs(docs[1].relevance - 0.274653) < EPSILON);
-	ASSERT_HINT(abs(docs[2].relevance - 0.219722) < EPSILON, "Difference between document relevance and current relevance must be equal to zero");
+
+	ASSERT(abs(docs[0].relevance - 0.366204) < EPSILON); // In these expression, the subtractive was calculated in advance.
+	ASSERT(abs(docs[1].relevance - 0.274653) < EPSILON); // In these expression, the subtractive was calculated in advance.
+	ASSERT_HINT(abs(docs[2].relevance - 0.219722) < EPSILON, "Difference between document relevance and current relevance must be equal to zero"s); // In these expression, the subtractive was calculated in advance.
 }
 
 void TestSearchServer() {
@@ -538,13 +536,13 @@ void TestSearchServer() {
 	RUN_TEST(TestFilteringWhithPredicate);
 	RUN_TEST(TestFilteringDocumentWhithDocumentStatus);
 	RUN_TEST(TestComputeRelevance);
-	
+
 }
 
 // --------- Окончание модульных тестов поисковой системы -----------
 
 int main() {
 	TestSearchServer();
-	
+
 	cout << "Search server testing finished"s << endl;
 }
