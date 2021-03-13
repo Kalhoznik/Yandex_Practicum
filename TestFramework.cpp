@@ -367,7 +367,7 @@ void TestAddingDocument() {
 		ASSERT_EQUAL(doc[1].id, 2);
 	}
 	{
-		const auto& doc = search_server.FindTopDocuments("чайка летит"s);
+		const auto doc = search_server.FindTopDocuments("чайка летит"s);
 		ASSERT_HINT(doc.empty(), "Size must equal to zero");
 	}
 }
@@ -380,7 +380,7 @@ void TestExludeDocmentsWhoContainsMinusWords() {
 		SearchServer search_server;
 		search_server.AddDocument(0, document_conetent, DocumentStatus::ACTUAL, { 3,2,1,6 });
 		const string query = "пес и хвост"s;
-		const auto& docs = search_server.FindTopDocuments(query);
+		const auto docs = search_server.FindTopDocuments(query);
 		ASSERT_EQUAL(docs.size(), 1u);
 		ASSERT_EQUAL(docs[0].id, 0);
 
@@ -389,7 +389,7 @@ void TestExludeDocmentsWhoContainsMinusWords() {
 		SearchServer search_server;
 		search_server.AddDocument(0, document_conetent, DocumentStatus::ACTUAL, { 3,2,1,6 });
 		const string query = "пес и -хвост"s;
-		const auto& docs = search_server.FindTopDocuments(query);
+		const auto docs = search_server.FindTopDocuments(query);
 		ASSERT_HINT(docs.empty(), "Size must be empty"s);
 	}
 
@@ -447,9 +447,9 @@ void TestRelevantseSort() {
 	server.AddDocument(2, second_doc_content, DocumentStatus::ACTUAL, { 3,2,5 });
 	server.AddDocument(3, third_doc_content, DocumentStatus::ACTUAL, { 2,7,10 });
 	const string query = "кот пёс хвост"s;
-	const auto& docs = server.FindTopDocuments(query);
+	const auto docs = server.FindTopDocuments(query);
 	for (size_t curr = 1; curr < docs.size(); ++curr) {
-		ASSERT_HINT(docs[curr].relevance < docs[curr - 1].relevance, "Previous document must be great then current"s);
+		ASSERT_HINT(docs[curr].relevance <= docs[curr - 1].relevance, "Previous document must be great then current"s);
 	}
 }
 
@@ -459,7 +459,7 @@ void TestComputeRating() {
 	SearchServer server;
 	server.AddDocument(1, first_doc_content, DocumentStatus::ACTUAL, { 5,2,1 });
 	server.AddDocument(2, second_doc_content, DocumentStatus::ACTUAL, { 3,2,5 });
-	string query = "кот пёс хвост";
+	const string query = "кот пёс хвост";
 	const auto docs = server.FindTopDocuments(query);
 	ASSERT_EQUAL(docs.size(), 2);
 	ASSERT_EQUAL(docs[0].rating, 3);
@@ -475,7 +475,7 @@ void TestFilteringWhithPredicate() {
 	server.AddDocument(1, first_doc_content, DocumentStatus::ACTUAL, { 5,2,1 });
 	server.AddDocument(2, second_doc_content, DocumentStatus::ACTUAL, { 3,2,5 });
 	server.AddDocument(3, third_doc_content, DocumentStatus::ACTUAL, { 2,5,6 });
-	const string query = "кот пёс хвост";
+	const string query = "кот пёс хвост"s;
 	const auto docs = server.FindTopDocuments(query, [](int document_id, DocumentStatus status, int rating) { return document_id >= 2; });
 
 	ASSERT_EQUAL(docs.size(), 2);
@@ -486,24 +486,33 @@ void TestFilteringWhithPredicate() {
 void TestFilteringDocumentWhithDocumentStatus() {
 	const string first_doc_content = "белый кот и модный ошейник"s;
 	const string second_doc_content = "ухоженный пёс выразительные глаза"s;
-
+	const string third_doc_content = "пушистый пушистый хвост"s;
+	const string fourth_doc_content = "собака на сене"s;
 
 	{
 		SearchServer server;
 		server.AddDocument(1, first_doc_content, DocumentStatus::ACTUAL, { 5,2,1 });
 		server.AddDocument(2, second_doc_content, DocumentStatus::BANNED, { 3,2,5 });
-		const string query = "кот пёс хвост"s;
-		const auto& docs = server.FindTopDocuments(query, DocumentStatus::ACTUAL);
-		ASSERT_EQUAL(docs[0].id, 1);
+		server.AddDocument(3, third_doc_content, DocumentStatus::ACTUAL, { 5,4,8,10 });
+		server.AddDocument(4, fourth_doc_content, DocumentStatus::BANNED, { 3,2,8,6,4 });
+		const string query = "кот пёс хвост собака"s;
+		const auto docs = server.FindTopDocuments(query, DocumentStatus::ACTUAL);
+		ASSERT_EQUAL(docs.size(), 2);
+		ASSERT_EQUAL(docs[0].id, 3);
+		ASSERT_EQUAL(docs[1].id, 1);
 	}
 
 	{
 		SearchServer server;
 		server.AddDocument(1, first_doc_content, DocumentStatus::ACTUAL, { 5,2,1 });
 		server.AddDocument(2, second_doc_content, DocumentStatus::BANNED, { 3,2,5 });
-		const string query = "кот пёс хвост"s;
-		const auto& docs = server.FindTopDocuments(query, DocumentStatus::BANNED);
-		ASSERT_EQUAL(docs[0].id, 2);
+		server.AddDocument(3, third_doc_content, DocumentStatus::ACTUAL, { 5,4,8,10 });
+		server.AddDocument(4, fourth_doc_content, DocumentStatus::BANNED, { 3,2,8,6,4 });
+		const string query = "кот пёс хвост собака"s;
+		const auto docs = server.FindTopDocuments(query, DocumentStatus::BANNED);
+		ASSERT_EQUAL(docs.size(), 2);
+		ASSERT_EQUAL(docs[0].id, 4);
+		ASSERT_EQUAL(docs[1].id, 2);
 	}
 }
 
