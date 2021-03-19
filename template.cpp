@@ -28,8 +28,6 @@ int ReadLineWithNumber() {
 	return result;
 }
 
-
-
 vector<string> SplitIntoWords(const string& text) {
 	vector<string> words;
 	string word;
@@ -47,7 +45,6 @@ vector<string> SplitIntoWords(const string& text) {
 	if (!word.empty()) {
 		words.push_back(word);
 	}
-
 	return words;
 }
 
@@ -64,8 +61,6 @@ struct Document {
 	double relevance = 0.0;
 	int rating = 0;
 };
-
-
 
 enum class DocumentStatus {
 	ACTUAL,
@@ -93,7 +88,7 @@ public:
 	void AddDocument(int document_id, const string& document, DocumentStatus status,
 		const vector<int>& ratings) {
 		if ((document_id < 0) || (documents_.count(document_id) > 0)) {
-			throw  invalid_argument("invalid document id");
+			throw  invalid_argument("invalid document id"s);
 		}
 		const auto words = SplitIntoWordsNoStop(document);
 
@@ -103,12 +98,10 @@ public:
 		}
 		documents_.emplace(document_id, DocumentData{ ComputeAverageRating(ratings), status });
 		document_ids_.push_back(document_id);
-
 	}
 
 	template <typename DocumentPredicate>
 	vector<Document> FindTopDocuments(const string& raw_query, DocumentPredicate document_predicate) const {
-
 		const Query query = ParseQuery(raw_query);
 		auto matched_documents = FindAllDocuments(query, document_predicate);
 
@@ -123,9 +116,6 @@ public:
 		if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
 			matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
 		}
-
-		// Exchange matched_documents and result instead of deep copying
-
 		return matched_documents;
 	}
 
@@ -147,10 +137,7 @@ public:
 	}
 
 	tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query, int document_id) const {
-		// Empty result by initializing it with default constructed tuple
-
 		const Query query = ParseQuery(raw_query);
-
 		vector<string> matched_words;
 		for (const string& word : query.plus_words) {
 			if (word_to_document_freqs_.count(word) == 0) {
@@ -169,7 +156,6 @@ public:
 				break;
 			}
 		}
-
 		return { matched_words, documents_.at(document_id).status };
 	}
 
@@ -188,7 +174,6 @@ private:
 		return stop_words_.count(word) > 0;
 	}
 
-
 	static bool IsValidWord(const string& word) {
 		// A valid word must not contain special characters
 		return none_of(word.begin(), word.end(), [](char c) {
@@ -206,7 +191,6 @@ private:
 				words.push_back(word);
 			}
 		}
-
 		return words;
 	}
 
@@ -242,8 +226,6 @@ private:
 	};
 
 	QueryWord ParseQueryWord(string text) const {
-		// Empty result by initializing it with default constructed QueryWord
-
 		if (text.empty()) {
 			throw invalid_argument("word is empty"s);
 		}
@@ -255,7 +237,6 @@ private:
 		if (text.empty() || text[0] == '-' || !IsValidWord(text)) {
 			throw invalid_argument("Searching invalid word");
 		}
-
 		return { text, is_minus, IsStopWord(text) };
 	}
 
@@ -265,7 +246,6 @@ private:
 	};
 
 	Query ParseQuery(const string& text) const {
-		// Empty result by initializing it with default constructed Query
 		Query query;
 		for (const string& word : SplitIntoWords(text)) {
 			const QueryWord query_word = ParseQueryWord(word);
@@ -320,6 +300,7 @@ private:
 };
 
 // ------------ Пример использования ----------------
+
 
 void PrintDocument(const Document& document) {
 	cout << "{ "s
@@ -380,9 +361,9 @@ int main() {
 
 	SearchServer search_server("и в на"s);
 
-	AddDocument(search_server, 1, "пушистый кот пушистый хвост", DocumentStatus::ACTUAL, { 7, 2, 7 });
-	AddDocument(search_server, 1, "пушистый пёс и модный ошейник", DocumentStatus::ACTUAL, { 1, 2 });
-	AddDocument(search_server, -1, "пушистый пёс и модный ошейник", DocumentStatus::ACTUAL, { 1, 2 });
+	AddDocument(search_server, 1, "пушистый кот пушистый хвост"s, DocumentStatus::ACTUAL, { 7, 2, 7 });
+	AddDocument(search_server, 1, "пушистый пёс и модный ошейник"s, DocumentStatus::ACTUAL, { 1, 2 });
+	AddDocument(search_server, -1, "пушистый пёс и модный ошейник"s, DocumentStatus::ACTUAL, { 1, 2 });
 	AddDocument(search_server, 3, "большой пёс скво\x12рец евгений"s, DocumentStatus::ACTUAL, { 1, 3, 2 });
 	AddDocument(search_server, 4, "большой пёс скворец евгений"s, DocumentStatus::ACTUAL, { 1, 1, 1 });
 
