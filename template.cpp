@@ -8,7 +8,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <optional>
 #include <stdexcept>
 
 using namespace std;
@@ -71,17 +70,15 @@ enum class DocumentStatus {
 
 class SearchServer {
 public:
-	// Defines an invalid document id
-	// You can refer this constant as SearchServer::INVALID_DOCUMENT_ID
-	inline static constexpr int INVALID_DOCUMENT_ID = -1;
 
+	
 	template <typename StringContainer>
 	explicit SearchServer(const StringContainer& stop_words)
 		: stop_words_(MakeUniqueNonEmptyStrings(stop_words)) {
 	}
 
 	explicit SearchServer(const string& stop_words_text)
-		: SearchServer(SplitIntoWords(stop_words_text))  // Invoke delegating constructor from string container
+		: SearchServer(SplitIntoWords(stop_words_text))  
 	{
 	}
 
@@ -195,7 +192,7 @@ private:
 	}
 
 	template <typename StringContainer>
-	set<string> MakeUniqueNonEmptyStrings(const StringContainer& strings) {
+	static set<string> MakeUniqueNonEmptyStrings(const StringContainer& strings) {
 		set<string> non_empty_strings;
 		for (const string& str : strings) {
 			if (!str.empty()) {
@@ -300,7 +297,6 @@ private:
 };
 
 // ------------ Пример использования ----------------
-
 
 void PrintDocument(const Document& document) {
 	cout << "{ "s
