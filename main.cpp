@@ -13,7 +13,7 @@ using namespace std;
 template <typename Container>
   auto Paginate(const Container& c, size_t page_size) {
 
-  return Paginator(begin(c), end(c), page_size);
+  return Paginator<decltype (begin(c))>(begin(c), end(c), page_size);
 }
 
 void PrintDocument(const Document& document) {
