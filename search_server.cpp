@@ -1,6 +1,5 @@
-#include <math.h>
 #include "search_server.h"
-
+#include <cmath>
 
 SearchServer::SearchServer(const std::string& stop_words_text)
     : SearchServer(SplitIntoWords(stop_words_text)){

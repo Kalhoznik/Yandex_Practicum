@@ -1,7 +1,5 @@
 //Вставьте сюда своё решение из урока «‎Очередь запросов».‎// search_server_s4_t2_solution.cpp
 #include <iostream>
-#include <vector>
-#include <string>
 #include <stdexcept>
 #include "paginator.h"
 #include "request_queue.h"
@@ -9,12 +7,6 @@
 #include "search_server.h"
 
 using namespace std;
-
-template <typename Container>
-  auto Paginate(const Container& c, size_t page_size) {
-
-  return Paginator<decltype (begin(c))>(begin(c), end(c), page_size);
-}
 
 void PrintDocument(const Document& document) {
   cout << "{ "
@@ -32,41 +24,6 @@ void PrintMatchDocumentResult(int document_id, const vector<string>& words, Docu
   }
   cout << "}"s << endl;
 }
-
-void AddDocument(SearchServer& search_server, int document_id, const string& document, DocumentStatus status,
-                 const vector<int>& ratings) {
-  try {
-    search_server.AddDocument(document_id, document, status, ratings);
-  } catch (const invalid_argument& e) {
-    cout << "Ошибка добавления документа "s << document_id << ": "s << e.what() << endl;
-  }
-}
-
-void FindTopDocuments(const SearchServer& search_server, const string& raw_query) {
-  cout << "Результаты поиска по запросу: "s << raw_query << endl;
-  try {
-    for (const Document& document : search_server.FindTopDocuments(raw_query)) {
-      PrintDocument(document);
-    }
-  } catch (const invalid_argument& e) {
-    cout << "Ошибка поиска: "s << e.what() << endl;
-  }
-}
-
-void MatchDocuments(const SearchServer& search_server, const string& query) {
-  try {
-    cout << "Матчинг документов по запросу: "s << query << endl;
-    const int document_count = search_server.GetDocumentCount();
-    for (int index = 0; index < document_count; ++index) {
-      const int document_id = search_server.GetDocumentId(index);
-      const auto [words, status] = search_server.MatchDocument(query, document_id);
-      PrintMatchDocumentResult(document_id, words, status);
-    }
-  } catch (const invalid_argument& e) {
-    cout << "Ошибка матчинга документов на запрос "s << query << ": "s << e.what() << endl;
-  }
-}
-
 
 
 int main() {
@@ -89,6 +46,6 @@ int main() {
   request_queue.AddFindRequest("big collar"s);
   // первый запрос удален, 1437 запросов с нулевым результатом
   request_queue.AddFindRequest("sparrow"s);
-  cout << "Total empty requests: "s << request_queue.GetNoResultRequests() << endl;
+  cout << "Total empty requests: "s << request_queue.GetNoResultRequests();
   return 0;
 }

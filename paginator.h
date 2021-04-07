@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <iterator>
+
 template <typename Iterator>
 class IteratorRange {
 public:
@@ -67,4 +68,10 @@ private:
   std::vector<IteratorRange<Iterator>> pages_;
 };
 
+
+template <typename Container>
+auto Paginate(const Container& c, size_t page_size) {
+
+  return Paginator(begin(c), end(c), page_size);
+}
 

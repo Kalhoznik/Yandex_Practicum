@@ -1,13 +1,15 @@
 #pragma once
-#include <string>
 #include "string_processing.h"
-#include <algorithm>
-#include <stdexcept>
-#include <vector>
 #include "document.h"
 #include <tuple>
 #include <map>
-const int MAX_RESULT_DOCUMENT_COUNT = 5;
+#include <set>
+#include <string>
+#include <algorithm>
+#include <stdexcept>
+#include <vector>
+
+    const int MAX_RESULT_DOCUMENT_COUNT = 5;
 
     enum class DocumentStatus {
       ACTUAL,
@@ -29,7 +31,6 @@ public:
   }
 
   explicit SearchServer(const std::string& stop_words_text);
-
 
   void AddDocument(int document_id, const std::string& document, DocumentStatus status, const std::vector<int>& ratings);
 
