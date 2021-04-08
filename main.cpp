@@ -1,29 +1,12 @@
 //Вставьте сюда своё решение из урока «‎Очередь запросов».‎// search_server_s4_t2_solution.cpp
 #include <iostream>
-#include <stdexcept>
+
 #include "paginator.h"
 #include "request_queue.h"
 #include "document.h"
 #include "search_server.h"
 
 using namespace std;
-
-void PrintDocument(const Document& document) {
-  cout << "{ "
-       << "document_id = " << document.id << ", "
-       << "relevance = " << document.relevance << ", "
-       << "rating = " << document.rating << " }" << endl;
-}
-
-void PrintMatchDocumentResult(int document_id, const vector<string>& words, DocumentStatus status) {
-  cout << "{ "
-       << "document_id = " << document_id << ", "
-       << "status = " << static_cast<int>(status) << ", "       << "words =";
-  for (const string& word : words) {
-    cout << ' ' << word;
-  }
-  cout << "}"s << endl;
-}
 
 
 int main() {

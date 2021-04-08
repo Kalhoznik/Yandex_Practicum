@@ -10,17 +10,14 @@
 #include <vector>
 
     const int MAX_RESULT_DOCUMENT_COUNT = 5;
-
     enum class DocumentStatus {
       ACTUAL,
       IRRELEVANT,
       BANNED,
       REMOVED,
       };
-
 class SearchServer {
 public:
-
   template <typename StringContainer>
   explicit SearchServer(const StringContainer& stop_words)
       : stop_words_(MakeUniqueNonEmptyStrings(stop_words))
@@ -37,7 +34,6 @@ public:
   template <typename DocumentPredicate>
   std::vector<Document> FindTopDocuments(const std::string& raw_query, DocumentPredicate document_predicate) const {
     const auto query = ParseQuery(raw_query);
-
     auto matched_documents = FindAllDocuments(query, document_predicate);
 
     std::sort(matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {

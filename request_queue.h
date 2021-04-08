@@ -20,7 +20,7 @@ public:
 private:
   struct QueryResult {
     std:: vector<Document> find_documents;
-    bool IsEmpty;
+    bool is_empty;
   };
   std::deque<QueryResult> requests_;
   std::vector<Document> AddRequest(const std::vector<Document>& documents);

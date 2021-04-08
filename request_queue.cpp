@@ -16,23 +16,21 @@ int RequestQueue::GetNoResultRequests() const {
   return empty_query_result_count;
 }
 
-std::vector<Document> RequestQueue::AddRequest(const std::vector<Document>& documents)
-{
+std::vector<Document> RequestQueue::AddRequest(const std::vector<Document>& documents){
   ++current_time;
   if((current_time > sec_in_day_) && !requests_.empty()){
-    if(requests_.back().IsEmpty)
+    if(requests_.back().is_empty)
       --empty_query_result_count;
     requests_.pop_back();
   }
 
-  QueryResult result;
   if(documents.empty()){
-    result = {documents,true};
+    requests_.push_front({documents,true});
     ++empty_query_result_count;
   }else{
-    result = {documents,false};
+    requests_.push_front({documents,false});
   }
-  requests_.push_front(result);
-  return result.find_documents;
+
+  return documents;
 }
 
