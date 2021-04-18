@@ -25,10 +25,10 @@ std::vector<Document> RequestQueue::AddRequest(const std::vector<Document>& docu
   }
 
   if(documents.empty()){
-    requests_.push_front({documents,true});
+    requests_.push_front({true});
     ++empty_query_result_count;
   }else{
-    requests_.push_front({documents,false});
+    requests_.push_front({false});
   }
 
   return documents;

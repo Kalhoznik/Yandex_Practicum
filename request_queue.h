@@ -18,7 +18,7 @@ public:
   int GetNoResultRequests() const;
 private:
   struct QueryResult {
-    std:: vector<Document> find_documents;
+
     bool is_empty;
   };
   std::deque<QueryResult> requests_;
