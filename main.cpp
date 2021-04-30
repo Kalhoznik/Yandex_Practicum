@@ -120,7 +120,6 @@ public:
     assert(size_ == 0 && head_.next_node == nullptr);
     SingleLinkedList tmp;
     tmp.Initialize(values.begin(),values.end());
-    //tmp.size_ =values.size();
     swap(tmp);
   }
 
@@ -133,7 +132,6 @@ public:
     }
     SingleLinkedList tmp;
     tmp.Initialize(other.begin(),other.end());
-   // tmp.size_ = other.size_;
     swap(tmp);
   }
 
