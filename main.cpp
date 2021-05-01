@@ -51,7 +51,7 @@ class SingleLinkedList {
     // Оператор сравнения итераторов (в роли второго аргумента выступает константный итератор)
     // Два итератора равны, если они ссылаются на один и тот же элемент списка, либо на end()
     [[nodiscard]] bool operator==(const BasicIterator<const Type>& rhs) const noexcept {
-      return (node_ == rhs.node_) || ((node_ == nullptr) && (rhs.node_ == nullptr)) ? true : false;
+      return (node_ == rhs.node_) || ((node_ == nullptr) && (rhs.node_ == nullptr));
     }
 
     // Оператор проверки итераторов на неравенство
@@ -63,7 +63,7 @@ class SingleLinkedList {
     // Оператор сравнения итераторов (в роли второго аргумента итератор)
     // Два итератора равны, если они ссылаются на один и тот же элемент списка, либо на end()
     [[nodiscard]] bool operator==(const BasicIterator<Type>& rhs) const noexcept {
-      return (node_ == rhs.node_) || ((node_ == nullptr) && (rhs.node_ == nullptr)) ? true : false;
+      return (node_ == rhs.node_) || ((node_ == nullptr) && (rhs.node_ == nullptr));
     }
 
     // Оператор проверки итераторов на неравенство
