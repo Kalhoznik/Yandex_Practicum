@@ -163,7 +163,7 @@ public:
   // Очищает список за время O(N)
   void Clear() noexcept {
     while(head_.next_node != nullptr){
-      const Node* removed_node = head_.next_node;
+      Node* const removed_node = head_.next_node;
       head_.next_node = removed_node->next_node;
       delete removed_node;
     }
@@ -236,7 +236,7 @@ public:
   }
 
   void PopFront() noexcept {
-    const Node* removed_node = head_.next_node;
+    Node* const removed_node = head_.next_node;
     assert(removed_node != nullptr);
     head_.next_node = removed_node->next_node;
     --size_;
@@ -248,7 +248,7 @@ public:
      * Возвращает итератор на элемент, следующий за удалённым
      */
   Iterator EraseAfter(ConstIterator pos) noexcept {
-    const Node* removed_node = pos.node_->next_node;
+    Node* const removed_node = pos.node_->next_node;
     assert(removed_node != nullptr);
     pos.node_->next_node = removed_node->next_node;
     delete removed_node;
