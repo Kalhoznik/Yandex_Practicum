@@ -267,17 +267,13 @@ private:
       return;
 
     SingleLinkedList tmp;
+    Node* curr = &tmp.head_;
 
-    tmp.head_.next_node = new Node(*begin_range,nullptr);
-    Node* curr = tmp.head_.next_node;
-    ++tmp.size_;
-
-    auto other_curr = std::next(begin_range);
-    while(other_curr!=end_range){
-      Node* new_node = new Node(*other_curr,nullptr);
+    while(begin_range!=end_range){
+      Node* new_node = new Node(*begin_range,nullptr);
       curr->next_node = new_node;
       curr = curr->next_node;
-      ++other_curr;
+      ++begin_range;
       ++tmp.size_;
     }
     swap(tmp);
