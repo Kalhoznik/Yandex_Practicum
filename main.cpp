@@ -248,8 +248,8 @@ public:
      * Возвращает итератор на элемент, следующий за удалённым
      */
   Iterator EraseAfter(ConstIterator pos) noexcept {
+    assert(pos.node_!= nullptr);
     Node* const removed_node = pos.node_->next_node;
-    assert(removed_node != nullptr);
     pos.node_->next_node = removed_node->next_node;
     delete removed_node;
     return Iterator{pos.node_->next_node};
