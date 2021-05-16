@@ -142,7 +142,6 @@ public:
       Iterator pure_iterator = begin() + offset;
 
       if(size_<capacity_){
-
         std::copy_backward(std::make_move_iterator(pure_iterator),std::make_move_iterator(end()),end() + 1 );
         items_[offset] = std::move(value);
         ++size_;

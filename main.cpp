@@ -156,9 +156,6 @@ void TestNoncopiableInsert() {
     v.PushBack(X(i));
   }
 
-  v.Reserve(10);
-
-
   v.Insert(v.begin(), X(size + 1));
   assert(v.GetSize() == size + 1);
   assert(v.begin()->GetX() == size + 1);
