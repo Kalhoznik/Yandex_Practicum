@@ -160,11 +160,11 @@ void TestNoncopiableInsert() {
   assert(v.GetSize() == size + 1);
   assert(v.begin()->GetX() == size + 1);
   // в конец
-  auto a = v.Insert(v.end(), X(size + 2));
+  v.Insert(v.end(), X(size + 2));
   assert(v.GetSize() == size + 2);
   assert((v.end() - 1)->GetX() == size + 2);
   // в середину
- auto b =  v.Insert(v.begin() + 3, X(size + 3));
+  v.Insert(v.begin() + 3, X(size + 3));
   assert(v.GetSize() == size + 3);
   assert((v.begin() + 3)->GetX() == size + 3);
   cout << "Done!" << endl << endl;

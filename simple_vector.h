@@ -99,7 +99,6 @@ public:
       }
     }
 
-
     void PushBack(Type item) {
       if(capacity_ == 0){
         size_t new_capacity = 1;   // выделить в отдельный метод что то типа increase_capacity_initialization
@@ -111,7 +110,7 @@ public:
         return;
       }
 
-      if(size_<capacity_){
+      if(size_ < capacity_){
         items_[size_] = std::move(item);
         ++size_;
       }else{
@@ -131,6 +130,7 @@ public:
     // Если перед вставкой значения вектор был заполнен полностью,
     // вместимость вектора должна увеличиться вдвое, а для вектора вместимостью 0 стать равной 1
     Iterator Insert(ConstIterator pos, Type value) {
+      assert(pos!= nullptr);
 
       if(capacity_ == 0 && pos ==  begin()){
         PushBack(std::move(value));
@@ -166,13 +166,12 @@ public:
 
    // Удаляет элемент вектора в указанной позиции
    Iterator Erase(ConstIterator pos) {
+     assert(pos != nullptr);
      auto offset = pos - begin();
      Iterator pure_iterator = begin() + offset;
-     if(pure_iterator + 1 != end()){
-       std::copy(std::make_move_iterator(pure_iterator +1), std::make_move_iterator(end()), pure_iterator);
-     }
+     std::copy(std::make_move_iterator(pure_iterator +1), std::make_move_iterator(end()), pure_iterator);
      --size_;
-     return pure_iterator;
+     return begin() + offset;
    }
 
     // Возвращает количество элементов в массиве
