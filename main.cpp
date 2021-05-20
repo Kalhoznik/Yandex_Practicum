@@ -1,8 +1,18 @@
 #include "simple_vector.h"
 #include <iostream>
 #include <numeric>
-
+#include <memory>
 using namespace std;
+
+struct Z {
+  Z() { std::cout << __PRETTY_FUNCTION__ << "\n"; }
+  ~Z() { std::cout << __PRETTY_FUNCTION__ << "\n"; }
+  Z(const Z  &) { std::cout << __PRETTY_FUNCTION__ << "\n"; }
+  Z(      Z &&) { std::cout << __PRETTY_FUNCTION__ << "\n"; }
+  Z &operator =(const Z  &) { std::cout << __PRETTY_FUNCTION__ << "\n"; return *this; }
+  Z &operator =(      Z &&) { std::cout << __PRETTY_FUNCTION__ << "\n"; return *this; }
+};
+
 
 void TestReserveConstructor() {
   cout << "TestReserveConstructor"s << endl;
@@ -194,6 +204,10 @@ int main() {
   TestNoncopiablePushBack();
   TestNoncopiableInsert();
   TestNoncopiableErase();
+
+
+  SimpleVector<std::unique_ptr<int>> a, b;
+  a = std::move(b);
 
 
   return 0;

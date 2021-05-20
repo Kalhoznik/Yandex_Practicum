@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cassert>
 #include <cstdlib>
 #include <utility>
@@ -21,17 +23,23 @@ public:
 
   // Запрещаем копирование
   ArrayPtr(const ArrayPtr&) = delete;
-
-  ~ArrayPtr() {
-    delete[]raw_ptr_;
-  }
-
   // Запрещаем присваивание
   ArrayPtr& operator=(const ArrayPtr&) = delete;
 
+  ArrayPtr (ArrayPtr&& other){
+    raw_ptr_ = std::exchange(other.raw_ptr_,nullptr);
+  }
+
   ArrayPtr& operator=(ArrayPtr&& other){
+    if(raw_ptr_ != nullptr)
+      delete [] raw_ptr_;
+
     raw_ptr_ = std::exchange(other.raw_ptr_,nullptr);
     return *this;
+  }
+
+  ~ArrayPtr() {
+    delete[]raw_ptr_;
   }
   // Прекращает владением массивом в памяти, возвращает значение адреса массива
   // После вызова метода указатель на массив должен обнулиться
@@ -53,7 +61,7 @@ public:
 
   // Возвращает true, если указатель ненулевой, и false в противном случае
   explicit operator bool() const {
-    return raw_ptr_ == nullptr;
+    return raw_ptr_ != nullptr;
   }
 
   // Возвращает значение сырого указателя, хранящего адрес начала массива
@@ -63,9 +71,7 @@ public:
 
     // Обменивается значениям указателя на массив с объектом other
   void swap(ArrayPtr& other) noexcept {
-    Type* tmp = other.raw_ptr_;
-    other.raw_ptr_ = raw_ptr_;
-    raw_ptr_ = tmp;
+    std::swap(raw_ptr_,other.raw_ptr_);
   }
 
 
