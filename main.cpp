@@ -182,7 +182,6 @@ void TestNoncopiableErase() {
   assert(it->GetX() == 1);
   cout << "Done!" << endl << endl;
 }
-
 int main() {
   TestTemporaryObjConstructor();
   TestTemporaryObjOperator();

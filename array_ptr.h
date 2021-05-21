@@ -26,8 +26,9 @@ public:
   // Запрещаем присваивание
   ArrayPtr& operator=(const ArrayPtr&) = delete;
 
-  ArrayPtr (ArrayPtr&& other){
-    raw_ptr_ = std::exchange(other.raw_ptr_,nullptr);
+  ArrayPtr (ArrayPtr&& other)
+      :raw_ptr_(std::exchange(other.raw_ptr_,nullptr))
+  {
   }
 
   ArrayPtr& operator=(ArrayPtr&& other){

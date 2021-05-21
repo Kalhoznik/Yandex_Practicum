@@ -7,22 +7,12 @@
 #include <stdexcept>
 #include <utility>
 
-class ReserveProxyObj{
-public:
-  explicit ReserveProxyObj(size_t capacty) noexcept
-      :capacity_(capacty)
-  {
-  }
-  size_t GetCapacity() const{
-    return capacity_;
-  }
-
-private:
+struct ReserveProxyObj{
   size_t capacity_ = 0;
 };
 
 ReserveProxyObj Reserve(size_t capacity_to_reserve) {
-  return ReserveProxyObj(capacity_to_reserve);
+  return ReserveProxyObj{capacity_to_reserve};
 }
 
 template <typename Type>
@@ -58,7 +48,7 @@ public:
     return *this;
   }
 
-  SimpleVector( SimpleVector&& other)
+  SimpleVector(SimpleVector&& other)
       :items_(other.items_.Release())
       ,capacity_(std::exchange(other.capacity_, 0))
       ,size_(std::exchange(other.size_, 0))
@@ -73,17 +63,12 @@ public:
     }
     return *this;
   }
-  SimpleVector(ReserveProxyObj proxy)
-      :items_(proxy.GetCapacity())
-        ,capacity_(proxy.GetCapacity())
-        ,size_(0)
-  {
-  }
 
-  void swap(SimpleVector& other) noexcept {
-    items_.swap(other.items_);
-    std::swap(size_,other.size_);
-    std::swap(capacity_,other.capacity_);
+  SimpleVector(ReserveProxyObj proxy)
+      :items_(proxy.capacity_)
+      ,capacity_(proxy.capacity_)
+      ,size_(0)
+  {
   }
 
   // Создаёт вектор из std::initializer_list
@@ -92,7 +77,13 @@ public:
       ,capacity_(init.size())
       ,size_(init.size())
   {
-    std::move(init.begin(),init.end(),begin());
+    std::copy(init.begin(),init.end(),begin());
+  }
+
+  void swap(SimpleVector& other) noexcept {
+    items_.swap(other.items_);
+    std::swap(size_,other.size_);
+    std::swap(capacity_,other.capacity_);
   }
 
   void Reserve(size_t new_capacity){
@@ -104,61 +95,20 @@ public:
     }
   }
 
-  template<typename Arg>
-  void PushBack(Arg&& item) {
-    if(capacity_ == 0){
-      const  size_t new_capacity = 1;   // выделить в отдельный метод что то типа increase_capacity_initialization
-      ArrayPtr<Type>new_items(new_capacity);
-      new_items[size_] = std::forward<Arg>(item);
-      items_.swap(new_items);
-      ++size_;
-      capacity_ = new_capacity;
-      return;
-    }
-    if(size_ < capacity_){
-      items_[size_] = std::move(item);
-      ++size_;
-    }else{
-      const  size_t new_capacity = capacity_ * 2;   // выделить в отдельный метод что то типа increase_capacity_initialization
-      ArrayPtr<Type>new_items(new_capacity);
-      std::move(begin(),end(),new_items.Get());
-      new_items[size_] = std::forward<Arg>(item);
-      items_.swap(new_items);
-      ++size_;
-      capacity_ = new_capacity;
-    }
+  void PushBack(const Type& item) {
+    UniversalPushBack(item);
   }
 
-  // Вставляет значение value в позицию pos.
-  // Возвращает итератор на вставленное значение
-  // Если перед вставкой значения вектор был заполнен полностью,
-  // вместимость вектора должна увеличиться вдвое, а для вектора вместимостью 0 стать равной 1
+  void PushBack(Type&& item) {
+    UniversalPushBack(std::move(item));
+  }
 
-   template<typename Arg>
-  Iterator Insert(ConstIterator pos, Arg value) {
+  Iterator Insert(ConstIterator pos, const Type& value) {
+     return UniversalPushInsert(pos, value);
+  }
 
-    if(capacity_ == 0 && pos ==  begin()){
-      PushBack(std::forward<Arg>(value));
-      return begin();
-    }
-
-    const auto offset = pos - begin();
-    Iterator position = begin() + offset;
-
-    if(size_<capacity_){
-      std::move_backward(position,end(),end() + 1 );
-      items_[offset] = std::forward<Arg>(value);
-    }else{
-      const size_t new_capacity = capacity_ * 2;
-      ArrayPtr<Type> new_items(new_capacity);
-      std::move(begin(),position,new_items.Get());
-      new_items[offset] = std::forward<Arg>(value);
-      std::move(position,end(),new_items.Get() + offset+ 1);
-      items_.swap(new_items);
-      capacity_ = new_capacity;
-    }
-    ++size_;
-    return  begin() + offset;
+  Iterator Insert(ConstIterator pos, Type&& value) {
+    return UniversalPushInsert(pos, std::move(value));
   }
 
   void PopBack() noexcept {
@@ -283,6 +233,57 @@ private:
   ArrayPtr<Type> items_;
   size_t capacity_ = 0;
   size_t size_ = 0;
+
+  template<typename Arg>
+  void UniversalPushBack(Arg&& value){
+    if(capacity_ == 0){
+      const size_t new_capacity = 1;
+      ArrayPtr<Type> new_items(new_capacity);
+      new_items[size_] = std::forward<Arg>(value);
+      items_.swap(new_items);
+      ++size_;
+      capacity_ = new_capacity;
+      return;
+    }
+    if(size_ < capacity_){
+      items_[size_] = std::move(value);
+      ++size_;
+    }else{
+      const  size_t new_capacity = capacity_ * 2;
+      ArrayPtr<Type> new_items(new_capacity);
+      std::move(begin(),end(),new_items.Get());
+      new_items[size_] = std::forward<Arg>(value);
+      items_.swap(new_items);
+      ++size_;
+      capacity_ = new_capacity;
+    }
+  }
+
+  template<typename Arg>
+  Iterator UniversalPushInsert(ConstIterator pos,Arg&& value){
+    if(capacity_ == 0 && pos ==  begin()){
+      PushBack(std::forward<Arg>(value));
+      return begin();
+    }
+
+    const auto offset = pos - begin();
+    Iterator position = begin() + offset;
+
+    if(size_<capacity_){
+      std::move_backward(position,end(),end() + 1 );
+      items_[offset] = std::forward<Arg>(value);
+    }else{
+      const size_t new_capacity = capacity_ * 2;
+      ArrayPtr<Type> new_items(new_capacity);
+      std::move(begin(),position,new_items.Get());
+      new_items[offset] = std::forward<Arg>(value);
+      std::move(position,end(),new_items.Get() + offset+ 1);
+      items_.swap(new_items);
+      capacity_ = new_capacity;
+    }
+    ++size_;
+    return  begin() + offset;
+  }
 
 };
 template <typename Type>
