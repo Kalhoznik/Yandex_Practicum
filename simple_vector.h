@@ -104,11 +104,11 @@ public:
   }
 
   Iterator Insert(ConstIterator pos, const Type& value) {
-     return UniversalPushInsert(pos, value);
+     return UniversalInsert(pos, value);
   }
 
   Iterator Insert(ConstIterator pos, Type&& value) {
-    return UniversalPushInsert(pos, std::move(value));
+    return UniversalInsert(pos, std::move(value));
   }
 
   void PopBack() noexcept {
@@ -260,7 +260,7 @@ private:
   }
 
   template<typename Arg>
-  Iterator UniversalPushInsert(ConstIterator pos,Arg&& value){
+  Iterator UniversalInsert(ConstIterator pos,Arg&& value){
     if(capacity_ == 0 && pos ==  begin()){
       PushBack(std::forward<Arg>(value));
       return begin();
