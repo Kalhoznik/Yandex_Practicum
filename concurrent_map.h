@@ -22,9 +22,10 @@ public:
 	static_assert(std::is_integral_v<Key>, "ConcurrentMap supports only integer keys");
 
 	struct Access {
-		Access(Backet& backet, Key key) 
+		Access(Backet& backet, Key key)
 			:guard(backet.mutex)
-			,ref_to_value(backet.map[key]) { }
+			,ref_to_value(backet.map[key])
+		{ }
 
 		std::lock_guard<std::mutex> guard;
 		Value& ref_to_value;
