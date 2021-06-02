@@ -14,7 +14,7 @@ void SearchServer::AddDocument(int document_id, std::string_view document, Docum
 	if ((document_id < 0) || (documents_.count(document_id) > 0)) {
 		throw std::invalid_argument("Invalid document_id");
 	}
-	const auto words = SplitIntoWordsNoStop(document);
+	const auto& words = SplitIntoWordsNoStop(document);
 
 	const double inv_word_count = 1.0 / words.size();
 	for (const std::string_view& word : words) {
@@ -98,7 +98,7 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
 
 	for (const std::string_view& word : query.plus_words) {
 		const std::string word_(word);
-		const auto find_item = word_to_document_freqs_.find(word_);
+		const auto& find_item = word_to_document_freqs_.find(word_);
 		if (find_item == word_to_document_freqs_.end()) {
 			continue;
 		}
@@ -113,7 +113,7 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
 	for (const std::string_view& word : query.minus_words) {
 
 		const std::string word_(word);
-		const auto find_item = word_to_document_freqs_.find(word_);
+		const auto& find_item = word_to_document_freqs_.find(word_);
 		if (find_item == word_to_document_freqs_.end()) {
 			continue;
 		}

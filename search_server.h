@@ -187,7 +187,6 @@ private:
 
 		ConcurrentMap<int, double> document_to_relevance_conc(3);
 
-
 		for (const std::string_view& word : query.plus_words) {
 			const std::string word_(word);
 			if (word_to_document_freqs_.count(word_) == 0) {
@@ -259,7 +258,7 @@ private:
 		std::for_each(policy, query.plus_words.begin(), query.plus_words.end(), [&, document_id](const auto& word) {
 
 			const std::string word_(word);
-			const auto find_item = word_to_document_freqs_.find(word_);
+			const auto& find_item = word_to_document_freqs_.find(word_);
 
 			if (find_item != word_to_document_freqs_.end() && word_to_document_freqs_.at(word_).count(document_id)) {
 				matched_words.push_back(find_item->first);
@@ -269,7 +268,7 @@ private:
 		std::for_each(policy, query.minus_words.begin(), query.minus_words.end(), [&, document_id](const auto& word) {
 
 			const std::string word_(word);
-			const auto find_item = word_to_document_freqs_.find(word_);
+			const auto& find_item = word_to_document_freqs_.find(word_);
 
 			if (find_item != word_to_document_freqs_.end() && word_to_document_freqs_.at(word_).count(document_id)) {
 				matched_words.clear();

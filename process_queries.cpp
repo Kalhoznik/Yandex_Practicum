@@ -33,11 +33,8 @@ std::list<Document> ProcessQueriesJoined(const SearchServer& search_server, cons
 		a.splice(a.end(), b);
 		return a; },
 		[&search_server](auto& request) {
-
-			std::list<Document> result;
-			for (auto& item : request) {
-				result.push_back(std::move(item));
-			}
+			std::list<Document> result(std::make_move_iterator(request.begin()), std::make_move_iterator(request.end()));
+			
 			return result;
 		});
 	
