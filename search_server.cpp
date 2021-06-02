@@ -51,13 +51,13 @@ std::vector<Document> SearchServer::FindTopDocuments(const std::execution::paral
 }
 
 /////
-std::vector<Document> SearchServer::FindTopDocuments(const std::execution::sequenced_policy & policy, std::string_view raw_query, DocumentStatus status) const
+std::vector<Document> SearchServer::FindTopDocuments(const std::execution::sequenced_policy& policy, std::string_view raw_query, DocumentStatus status) const
 {
 	return FindTopDocuments(policy, raw_query, [status](int document_id, DocumentStatus document_status, int rating) {
 		return document_status == status;
 	});
 }
-std::vector<Document> SearchServer::FindTopDocuments(const std::execution::sequenced_policy & policy, std::string_view raw_query) const
+std::vector<Document> SearchServer::FindTopDocuments(const std::execution::sequenced_policy& policy, std::string_view raw_query) const
 {
 	return FindTopDocuments(policy, raw_query, DocumentStatus::ACTUAL);
 }
@@ -127,13 +127,13 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
 	return { matched_words, documents_.at(document_id).status };
 }
 
-std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDocument(const std::execution::sequenced_policy & policy,
+std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDocument(const std::execution::sequenced_policy& policy,
 	std::string_view raw_query, int document_id) const {
 
 	return GeneralizedMatchDocument(policy, raw_query, document_id);
 }
 
-std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDocument(const std::execution::parallel_policy & policy,
+std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDocument(const std::execution::parallel_policy& policy,
 	std::string_view raw_query, int document_id) const {
 
 	return GeneralizedMatchDocument(policy, raw_query, document_id);
@@ -157,7 +157,6 @@ void SearchServer::RemoveDocument(const std::execution::sequenced_policy& policy
 void SearchServer::RemoveDocument(const std::execution::parallel_policy& policy, int document_id) {
 	GeneralizedRemoveDocument(policy, document_id);
 }
-
 
 
 bool SearchServer::IsStopWord(std::string_view word) const {

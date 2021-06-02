@@ -30,18 +30,15 @@ public:
 		std::lock_guard<std::mutex> guard;
 		Value& ref_to_value;
 	};
-
-
+	
 	explicit ConcurrentMap(size_t bucket_count) : bucket_count_(bucket_count), buckets_(bucket_count) { }
-
-
+	
 	Access operator[](const Key& key) {
 		uint64_t key_ = static_cast<uint64_t>(key);
 		uint64_t index = key_ % bucket_count_;
 		return Access(buckets_[index], key_);
 	}
-
-
+	
 	std::map<Key, Value> BuildOrdinaryMap() {
 		std::map<Key, Value> return_map;
 		for (size_t i = 0; i < bucket_count_; ++i) {

@@ -157,7 +157,7 @@ private:
 				continue;
 			}
 			const double inverse_document_freq = ComputeWordInverseDocumentFreq(word_);
-			for (const auto[document_id, term_freq] : word_to_document_freqs_.at(word_)) {
+			for (const auto&[document_id, term_freq] : word_to_document_freqs_.at(word_)) {
 				const auto& document_data = documents_.at(document_id);
 				if (document_predicate(document_id, document_data.status, document_data.rating)) {
 					document_to_relevance[document_id] += term_freq * inverse_document_freq;
@@ -170,13 +170,13 @@ private:
 			if (word_to_document_freqs_.count(word_) == 0) {
 				continue;
 			}
-			for (const auto[document_id, _] : word_to_document_freqs_.at(word_)) {
+			for (const auto&[document_id, _] : word_to_document_freqs_.at(word_)) {
 				document_to_relevance.erase(document_id);
 			}
 		}
 
 		std::vector<Document> matched_documents;
-		for (const auto[document_id, relevance] : document_to_relevance) {
+		for (const auto&[document_id, relevance] : document_to_relevance) {
 			matched_documents.push_back({ document_id, relevance, documents_.at(document_id).rating });
 		}
 		return matched_documents;
@@ -211,13 +211,13 @@ private:
 			if (word_to_document_freqs_.count(word_) == 0) {
 				continue;
 			}
-			for (const auto[document_id, _] : word_to_document_freqs_.at(word_)) {
+			for (const auto&[document_id, _] : word_to_document_freqs_.at(word_)) {
 				restore_document_to_relevance.erase(document_id);
 			}
 		}
 
 		std::vector<Document> matched_documents;
-		for (const auto[document_id, relevance] : restore_document_to_relevance) {
+		for (const auto&[document_id, relevance] : restore_document_to_relevance) {
 			matched_documents.push_back({ document_id, relevance, documents_.at(document_id).rating });
 		}
 		return matched_documents;
