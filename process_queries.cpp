@@ -8,12 +8,12 @@ std::vector<std::vector<Document>> ProcessQueries(const SearchServer& search_ser
 	if (queries.empty()) {
 		return{};
 	}
-	std::vector<SearchingDocuments> result(queries.size());
-	std::transform(std::execution::par, queries.begin(), queries.end(), result.begin(), [&search_server](const std::string& query) {
+	std::vector<SearchingDocuments> results(queries.size());
+	std::transform(std::execution::par, queries.begin(), queries.end(), results.begin(), [&search_server](const std::string& query) {
 		return search_server.FindTopDocuments(query);
 	});
 
-	return result;
+	return results;
 }
 
 std::list<Document> ProcessQueriesJoined(const SearchServer& search_server, const std::vector<std::string>& queries)
@@ -21,10 +21,10 @@ std::list<Document> ProcessQueriesJoined(const SearchServer& search_server, cons
 	if (queries.empty()) {
 		return {};
 	}
-	std::list<Document> result;
 
 	auto searching_documents = ProcessQueries(search_server, queries);
 
+	std::list<Document> result;
 	result = std::transform_reduce(std::execution::par,
 		searching_documents.begin(),
 		searching_documents.end(),
@@ -33,10 +33,10 @@ std::list<Document> ProcessQueriesJoined(const SearchServer& search_server, cons
 		a.splice(a.end(), b);
 		return a; },
 		[&search_server](auto& request) {
-			std::list<Document> result(std::make_move_iterator(request.begin()), std::make_move_iterator(request.end()));
-			
+			const std::list<Document> result(request.begin(), request.end());
+
 			return result;
 		});
-	
+
 	return result;
 }

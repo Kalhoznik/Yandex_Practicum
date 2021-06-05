@@ -9,3 +9,10 @@ void AddDocument(SearchServer &search_server,
 {
   search_server.AddDocument(document_id,document,status,rating);
 }
+
+void PrintDocument(const Document& document) {
+	std::cout << "{ "
+		<< "document_id = " << document.id << ", "
+		<< "relevance = " << document.relevance << ", "
+		<< "rating = " << document.rating << " }" << std::endl;
+}

@@ -35,7 +35,7 @@ public:
 
 	explicit SearchServer(std::string_view stop_words_text);
 
-	explicit SearchServer(std::string stop_words_text);
+	explicit SearchServer(const std::string& stop_words_text);
 
 	void AddDocument(int document_id, std::string_view document, DocumentStatus status, const std::vector<int>& ratings);
 
@@ -148,7 +148,6 @@ private:
 	template <typename DocumentPredicate>
 	std::vector<Document> FindAllDocuments(const Query& query, DocumentPredicate document_predicate) const {
 
-		ConcurrentMap<int, double> document_to_relevance_conc(3);
 
 		std::map<int, double> document_to_relevance;
 		for (const std::string_view& word : query.plus_words) {
@@ -194,7 +193,7 @@ private:
 			}
 			const double inverse_document_freq = ComputeWordInverseDocumentFreq(word_);
 
-			for_each(word_to_document_freqs_.at(word_).begin(), word_to_document_freqs_.at(word_).end(), [&](const auto& doc_to_freq) {
+			for_each(policy, word_to_document_freqs_.at(word_).begin(), word_to_document_freqs_.at(word_).end(), [&](const auto& doc_to_freq) {
 				const auto&[document_id, term_freq] = doc_to_freq;
 				const auto& document_data = documents_.at(document_id);
 				if (document_predicate(document_id, document_data.status, document_data.rating)) {
@@ -260,7 +259,10 @@ private:
 			const std::string word_(word);
 			const auto& find_item = word_to_document_freqs_.find(word_);
 
+			std::mutex lock;
+
 			if (find_item != word_to_document_freqs_.end() && word_to_document_freqs_.at(word_).count(document_id)) {
+				std::lock_guard guard(lock);
 				matched_words.push_back(find_item->first);
 			}
 		});
@@ -269,6 +271,7 @@ private:
 
 			const std::string word_(word);
 			const auto& find_item = word_to_document_freqs_.find(word_);
+
 
 			if (find_item != word_to_document_freqs_.end() && word_to_document_freqs_.at(word_).count(document_id)) {
 				matched_words.clear();

@@ -1,7 +1,7 @@
 #include "search_server.h"
 #include <cmath>
 
-SearchServer::SearchServer(std::string stop_words_text)
+SearchServer::SearchServer(const std::string& stop_words_text)
 	: SearchServer(SplitIntoWords(stop_words_text)) {
 
 }
@@ -15,10 +15,10 @@ void SearchServer::AddDocument(int document_id, std::string_view document, Docum
 		throw std::invalid_argument("Invalid document_id");
 	}
 	const auto& words = SplitIntoWordsNoStop(document);
-
+	
 	const double inv_word_count = 1.0 / words.size();
 	for (const std::string_view& word : words) {
-		std::string word_ = std::string(word);
+		const std::string word_ = std::string(word);
 		word_to_document_freqs_[word_][document_id] += inv_word_count;
 
 		const auto& view_word = word_to_document_freqs_.find(word_)->first;
@@ -79,7 +79,7 @@ std::set<int>::iterator SearchServer::end() const
 const std::map<std::string_view, double> &SearchServer::GetWordFrequencies(int document_id) const
 {
 	if (documents_.count(document_id) == 0) {
-		static std::map<std::string_view, double> empty_map;
+		static const std::map<std::string_view, double> empty_map;
 		return empty_map;
 	}
 	return document_to_word_freq_.at(document_id);

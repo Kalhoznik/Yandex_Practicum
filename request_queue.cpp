@@ -1,6 +1,6 @@
 #include "request_queue.h"
 
-RequestQueue::RequestQueue(SearchServer& search_server)
+RequestQueue::RequestQueue(const SearchServer& search_server)
     :server(search_server){
 }
 
